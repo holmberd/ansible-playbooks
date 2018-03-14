@@ -7,9 +7,8 @@ Do not run without being familiar with Ansible Playbooks and this script.
  - Creates a new EC2 Instance
  - Sets tags and instance name
  - Assigns a public ip to the new instance
- - Adds a record in route53
 
 ## Usage
-- Check Script Syntax: `AWS_PROFILE={PROFILE NAME HERE} ansible-playbook site.yml --check`
-- Run: `AWS_PROFILE=profile_name_here ansible-playbook site.yml --extra-vars "instance_name=enter-name-here" --ask-sudo-pass`
-- Alternative: `AWS_PROFILE={PROFILE NAME HERE} ansible-playbook site.yml --extra-vars "instance_name=enter-name-here" --extra-vars "ansible_sudo_pass=yourPassword"`
+- Check Script Syntax: `AWS_PROFILE={PROFILE NAME} ansible-playbook site.yml --check`
+- Run: `AWS_PROFILE={PROFILE NAME} ansible-playbook site.yml --extra-vars "instance_name=enter-name-here" --ask-sudo-pass`
+- Alternative: `AWS_PROFILE={PROFILE NAME} ansible-playbook site.yml --extra-vars "instance_name=enter-name-here" --extra-vars "ansible_sudo_pass=yourPassword"`

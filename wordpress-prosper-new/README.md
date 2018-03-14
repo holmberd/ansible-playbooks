@@ -1,11 +1,10 @@
-# Wordpress/Prospser Creation Playbook
+# Wordpress MySQL Nginx Creation Playbook
 
 ## :warning: Warning
 Do not run without being familiar with Ansible Playbooks and this script.
 
 ## Summary
  - Install + Configure MySQL
- - Install + Configure Prosper202
  - Install + Configure Wordpress + Themes + Plugins
  - Install + Configure Nginx
  - Install + Configure FPM-PHP
