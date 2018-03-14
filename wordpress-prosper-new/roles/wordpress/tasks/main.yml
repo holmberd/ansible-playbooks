@@ -1,0 +1,98 @@
+---
+- name: Create WordPress database
+  # become_user: "{{ default_user }}"
+  mysql_db:
+    name: "{{ wp_db_name }}"
+    state: present
+
+#- name: Create Wordpress database user
+#  become_user: "{{ default_user }}"
+#  mysql_user: name={{ wp_db_user }} password={{ wp_db_password }} priv={{ wp_db_name }}.*:ALL host='localhost' state=present
+
+- name: Download wp[-cli]
+  get_url:
+    url: https://raw.github.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    dest: /usr/local/bin/wp
+    mode: 0775
+    owner: "{{ default_user }}"
+
+- name: Download wordpress using wp[-cli]
+  become_user: "{{ default_user }}"
+  command: wp core download --path={{wp_location}} --version=4.8.1 # there was a problem decompressing 4.8.2, fix: wp cli update --nightly
+  args:
+    creates: "{{wp_location}}index.php"
+
+- name: Fetch random salts for WordPress config
+  local_action: command curl https://api.wordpress.org/secret-key/1.1/salt/
+  register: "wp_salt"
+  become: no
+  become_method: sudo
+  become_user: "{{ default_user }}"
+
+- name: Copy WordPress config file
+  template:
+    src: wp-config.php
+    dest: "{{ wp_location }}"
+    owner: "{{ wp_owner }}"
+    group: "{{ wp_group }}"
+
+- name: Install WordPress
+  become_user: "{{ default_user }}"
+  command: wp --path=/home/ubuntu/wordpress/ core install --url={{wp_domain}} --title={{wp_domain}} --admin_user={{wp_admin_user}} --admin_password={{wp_admin_pass}} --admin_email={{wp_admin_email}}
+
+- name: Install and activate Wordpress Plugins
+  become_user: "{{ default_user }}"
+  command: wp --path={{wp_location}} plugin install {{ item }} --force --activate
+  with_items:
+     #- 'admin-columns-pro'
+     #- 'cac-addon-acf'
+     - 'advanced-custom-fields'
+     #- 'advanced-custom-fields-pro'
+     #- 'acf-repeater'
+     - 'akismet'
+     - 'amazon-web-services'
+     - 'duplicate-post'
+     - 'wordpress-importer'
+     - 'amazon-s3-and-cloudfront'
+
+- name: Fetch Wordpress github plugin
+  become_user: "{{ default_user }}"
+  git:
+    repo: git@github.com:somewhere/something.git
+    dest: "{{ wp_location }}wp-content/plugins/something"
+    key_file: /home/ubuntu/resources/keys/somekey.deploy.pem
+    accept_hostkey: true
+    version: "{{ lpa_version }}"
+
+- name: Change LPA git repo remote URL
+  become_user: "{{ default_user }}"
+  command: "git -C {{wp_location}}wp-content/plugins/lpa remote set-url origin git@github.com:somewhere/something.git"
+
+- name: Install and activate Wordpress theme
+  become_user: "{{ default_user }}"
+  command: wp --path={{ wp_location }} theme install {{ wp_theme_url }} --force --activate
+  ignore_errors: true # since switching themes throws errors, see https://github.com/wp-cli/extension-command/issues/40
+
+- name: Change ownership of WordPress installation
+  file:
+    path: "{{ wp_location }}"
+    owner: "{{ wp_owner }}"
+    mode: 0775
+    group: "{{ wp_group }}"
+    state: directory
+    recurse: true
+
+- name: Add default user to web-server group
+  command: "usermod -a -G www-data {{ default_user }}"
+
+- name: Ensure directories are 0775
+  command: find {{ wp_location }} -type d -exec chmod 0775 {} \;
+
+- name: Ensure files are 0664
+  command: find {{ wp_location }} -type f -exec chmod 0664 {} \;
+
+- name: Restart php-fpm Service
+  service: name=php7.0-fpm state=restarted
+
+- name: Restart Nginx Service
+  service: name=nginx state=restarted

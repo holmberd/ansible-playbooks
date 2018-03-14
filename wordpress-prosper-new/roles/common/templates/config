@@ -1,0 +1,12 @@
+Host gitlpa
+  Hostname github.com
+  IdentityFile ~/resources/keys/lpa.deploy.pem
+
+Host gitpuct
+  Hostname github.com
+  IdentityFile ~/resources/keys/puct.deploy.pem
+
+Host gitprosper
+  Hostname github.com
+  IdentityFile ~/resources/keys/prosper.deploy.pem
+

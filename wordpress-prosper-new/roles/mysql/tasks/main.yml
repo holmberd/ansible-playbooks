@@ -1,0 +1,22 @@
+---
+- name: Install Mysql package
+  apt: name={{ item }} state=present
+  with_items:
+   - mysql-server
+   - python-mysqldb
+
+- name: Create Mysql configuration file
+  template:
+    src: my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+
+- name: Set database user password
+  mysql_user:
+    name: "{{ mysql_login_user }}"
+    password: "{{ mysql_login_pass }}"
+    priv: '*.*:ALL'
+    state: present
+
+- name: Start Mysql Service
+  service: name=mysql state=started enabled=yes

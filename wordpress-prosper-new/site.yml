@@ -1,0 +1,38 @@
+---
+
+- name: Refresh inventory
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Refresh EC2 cache
+      command: /etc/ansible/hosts/ec2.py --refresh-cache
+    - name: Refresh in-memory EC2 cache
+      meta: refresh_inventory
+
+- name: Copy resources from remote to localhost
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Copy Prosper SQL dump from S3 
+      s3: 
+        bucket: "{{ s3_bucket }}"
+        object: /autoprosper/{{ prosper_bootstrap_db }}
+        dest: ./roles/common/files/resources/{{ prosper_sql_name }}
+        mode: get
+        overwrite: different
+
+- name: Configure launched instance (WordPress, MySQL, Nginx, fpm-php)
+  hosts: launched
+  remote_user: "{{ default_user }}"
+  become: true
+  become_method: sudo
+  gather_facts: yes
+
+  roles:
+    - common
+    - mysql
+    - nginx
+    - php-fpm
+    - wordpress

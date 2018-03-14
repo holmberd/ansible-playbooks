@@ -1,0 +1,15 @@
+---
+- name: Configure launched instance (WordPress, MySQL, Nginx, fpm-php, prosper202)
+  hosts: new
+  # remote_user: root
+  remote_user: ubuntu
+  become: true
+  become_method: sudo
+  gather_facts: yes
+
+  roles:
+    - common
+    - mysql
+    - nginx
+    - php-fpm
+    - wordpress

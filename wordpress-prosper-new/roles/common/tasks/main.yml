@@ -1,0 +1,64 @@
+---
+
+- name: Copy resource files to instance
+  copy:
+    src: resources
+    dest: "{{ home_path }}"
+
+- name: Find ssh key files
+  find:
+    paths: /home/ubuntu/resources/keys
+    patterns: "*.pem, *.pub"
+  register: find_result
+
+- name: Set ssh key file permissions
+  file:
+    path: "{{ item['path'] }}"
+    mode: 0600
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+  with_items: "{{ find_result['files'] }}"
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+
+- name: Install system requirements
+  apt: name={{ item }} state=present
+  with_items:
+   - git
+   - awscli
+
+- name: Configure Git
+  become_user: ubuntu
+  git_config:
+    name="{{ item.name }}"
+    scope=global
+    value="{{ item.value }}"
+  with_items:
+    - {name: "user.name",  value: "Server" }
+    - {name: "user.email", value: "holmberd@gmail.com" }
+    - {name: "push.default",   value: "simple" }
+
+- name: ensure github.com is a known host
+  lineinfile:
+    dest: /etc/ssh/ssh_known_hosts
+    create: true
+    state: present
+    line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.com') }}"
+    regexp: "^github\\.com"
+
+- name: Copy SSH config file
+  template:
+    src: config
+    dest: "{{ home_path }}.ssh/"
+    mode: 0644
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+
+- name: Add default user to webserver group
+  user:
+    name: "{{ default_user }}"
+    groups: "{{ wp_group }}"
+    append: true
+

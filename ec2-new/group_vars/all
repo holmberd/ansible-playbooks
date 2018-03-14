@@ -1,0 +1,12 @@
+---
+# AWS
+region: us-west-2
+
+# EC2 Instance
+launched_inventory: /etc/ansible/hosts/launched
+instance_name: test-server
+security_group: sg-5221362b
+keypair: lm
+instance_type: m4.large
+ami_id: ami-7c803d1c
+bucket: backup

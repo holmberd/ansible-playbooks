@@ -1,0 +1,26 @@
+---
+- name: Install php-fpm and deps
+  apt: name={{ item }} state=present
+  with_items:
+    - php
+    - php-zip
+    - php-curl
+    - php-mcrypt
+    - php-memcache
+    - php-soap
+    - php-fpm
+    - php-mysql
+    - php-xml
+
+- name: Copy php-fpm user configurations
+  template:
+    src: user.ini
+    dest: /etc/php/7.0/fpm/conf.d/
+    mode: 0777
+
+- name: Start php-fpm Service
+  service: name=php7.0-fpm state=started enabled=yes
+
+# - name: Disable default pool
+#  command: mv /etc/php/7.0/fpm/pool.d/www.conf /etc/php/7.0/fpm/pool.d/www.disabled creates=/etc/php/7.0/fpm/pool.d/www.disabled
+#  notify: restart php-fpm

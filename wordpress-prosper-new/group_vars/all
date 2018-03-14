@@ -1,0 +1,58 @@
+---
+# AWS
+region: us-west-2
+
+# System
+default_user: ubuntu
+home_path: /home/ubuntu/
+resources_path: /home/ubuntu/resources/
+
+# MySQL
+mysql_login_user: root
+mysql_login_pass: root
+
+# S3
+s3_bucket: backup
+
+# EC2 Instance
+instance_name: testserver4
+route53_domain: testdomain.com
+security_group: sg-5221362b
+keypair: lm
+instance_type: m4.large
+ami_id: ami-7c803d1c
+bucket: backup
+
+# Wordpress
+wp_domain: my-wordpress-domain.net
+wp_owner: www-data
+wp_group: www-data
+wp_location: /home/ubuntu/wordpress/
+wp_theme_url: https://github.com/JeremyEnglert/JointsWP/archive/4.0.zip
+
+# Wordpress default admin
+wp_admin_user: potato
+wp_admin_pass: wilson
+wp_admin_email: test@test.com
+
+# WordPress database settings
+wp_db_name: wordpress_db
+wp_db_user: root
+wp_db_password: root
+
+# You shouldn't need to change this.
+mysql_port: 3306
+
+# This is used for the nginx server configuration, but access to the
+# WordPress site is not restricted by a named host.
+server_hostname: www.example.com
+
+# Disable All Updates
+# By default automatic updates are enabled, set this value to true to disable all automatic updates
+auto_up_disable: false
+
+#Define Core Update Level
+#true  = Development, minor, and major updates are all enabled
+#false = Development, minor, and major updates are all disabled
+#minor = Minor updates are enabled, development, and major updates are disabled
+core_update_level: false
