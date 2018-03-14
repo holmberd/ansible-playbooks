@@ -15,11 +15,11 @@
   connection: local
   gather_facts: False
   tasks:
-    - name: Copy Prosper SQL dump from S3 
+    - name: Copy QL dump from S3 
       s3: 
         bucket: "{{ s3_bucket }}"
-        object: /autoprosper/{{ prosper_bootstrap_db }}
-        dest: ./roles/common/files/resources/{{ prosper_sql_name }}
+        object: /sql-dump/{{ sql_dump_db }}
+        dest: ./roles/common/files/resources/{{ sql_dump_db }}
         mode: get
         overwrite: different
 

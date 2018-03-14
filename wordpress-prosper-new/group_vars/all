@@ -10,6 +10,7 @@ resources_path: /home/ubuntu/resources/
 # MySQL
 mysql_login_user: root
 mysql_login_pass: root
+ql_dump_db: dump-file-name
 
 # S3
 s3_bucket: backup
